@@ -12,6 +12,10 @@ export const {
 } = createStitches({
   theme: {
     colors: {
+      'background-gradient':
+        'linear-gradient(180deg, #1ea483 0%, #7465d4 100%)',
+      'skeleton-gradient':
+        'linear-gradient(168deg, rgba(29,29,29,1) 0%, rgba(106,106,106,1) 52%, rgba(157,157,157,1) 100%)',
       white: '#FFF',
 
       gray900: '#121214',

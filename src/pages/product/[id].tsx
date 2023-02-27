@@ -8,6 +8,7 @@ import { formatCurrency } from '@/utils/format'
 
 import * as S from '@/styles/pages/product'
 import axios from 'axios'
+import Head from 'next/head'
 import { useState } from 'react'
 import { ProductSkeleton } from './_skeleton'
 
@@ -49,22 +50,35 @@ export default function Product({ product }: ProductProps) {
   }
 
   return (
-    <S.Container>
-      <S.ImageContainer>
-        <Image src={product.imageUrl} alt='Produto' width={520} height={480} />
-      </S.ImageContainer>
+    <>
+      <Head>
+        <title>{product.name} | Ignite Shop</title>
+      </Head>
+      <S.Container>
+        <S.ImageContainer>
+          <Image
+            src={product.imageUrl}
+            alt='Produto'
+            width={520}
+            height={480}
+          />
+        </S.ImageContainer>
 
-      <S.ProductDetails>
-        <h1>{product.name}</h1>
-        <span>{product.price}</span>
+        <S.ProductDetails>
+          <h1>{product.name}</h1>
+          <span>{product.price}</span>
 
-        <p>{product.description}</p>
+          <p>{product.description}</p>
 
-        <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>
-          Comprar agora
-        </button>
-      </S.ProductDetails>
-    </S.Container>
+          <button
+            disabled={isCreatingCheckoutSession}
+            onClick={handleBuyProduct}
+          >
+            Comprar agora
+          </button>
+        </S.ProductDetails>
+      </S.Container>
+    </>
   )
 }
 

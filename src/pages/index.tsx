@@ -3,23 +3,21 @@ import Image from 'next/image'
 
 import * as S from '@/styles/pages/home'
 
-import Camiseta1 from '@/assets/camisas/1.png'
-import Camiseta2 from '@/assets/camisas/2.png'
-import Camiseta3 from '@/assets/camisas/3.png'
-import Camiseta4 from '@/assets/camisas/4.png'
-import Camiseta5 from '@/assets/camisas/5.png'
-
+import { stripe } from '@/lib/stripe'
 import 'keen-slider/keen-slider.min.css'
+import { GetServerSideProps } from 'next'
+import Stripe from 'stripe'
 
-const shirts = [
-  { img: Camiseta1, name: 'Camisa 1' },
-  { img: Camiseta2, name: 'Camisa 2' },
-  { img: Camiseta3, name: 'Camisa 3' },
-  { img: Camiseta4, name: 'Camisa 4' },
-  { img: Camiseta5, name: 'Camisa 5' },
-]
+type HomeProps = {
+  products: Array<{
+    id: string
+    name: string
+    imageUrl: string
+    price: number
+  }>
+}
 
-export default function Home() {
+export default function Home({ products }: HomeProps) {
   const [sliderRef] = useKeenSlider({
     slides: {
       perView: 3,
@@ -29,17 +27,46 @@ export default function Home() {
 
   return (
     <S.HomeContainer ref={sliderRef} className='keen-slider'>
-      {shirts.map((shirt) => (
-        <S.Product key={shirt.name} className='keen-slider__slide'>
-          <Image src={shirt.img} width={520} height={480} alt='Camisa 1' />
+      {products.map((product) => (
+        <S.Product key={product.id} className='keen-slider__slide'>
+          <Image
+            src={product.imageUrl}
+            width={520}
+            height={480}
+            alt='Camisa 1'
+          />
 
           <footer>
-            <strong>{shirt.name}</strong>
+            <strong>{product.name}</strong>
 
-            <span>R$ 79,90</span>
+            <span>{product.price}</span>
           </footer>
         </S.Product>
       ))}
     </S.HomeContainer>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const response = await stripe.products.list({
+    expand: ['data.default_price'],
+  })
+
+  const products = response.data.map((product) => {
+    const price = product.default_price as Stripe.Price
+
+    return {
+      id: product.id,
+      name: product.name,
+      imageUrl: product.images[0],
+      price: (price.unit_amount ?? 0) / 100,
+    }
+  })
+  console.log(products)
+
+  return {
+    props: {
+      products,
+    },
+  }
 }

@@ -7,6 +7,8 @@ import { stripe } from '@/lib/stripe'
 import { formatCurrency } from '@/utils/format'
 
 import * as S from '@/styles/pages/product'
+import axios from 'axios'
+import { useState } from 'react'
 import { ProductSkeleton } from './_skeleton'
 
 type ProductProps = {
@@ -15,12 +17,32 @@ type ProductProps = {
     name: string
     imageUrl: string
     price: string
+    priceId: string
     description: string | null
   }
 }
 
 export default function Product({ product }: ProductProps) {
   const { isFallback } = useRouter()
+
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
+    useState(false)
+
+  const handleBuyProduct = async () => {
+    try {
+      setIsCreatingCheckoutSession(true)
+      const response = await axios.post('/api/checkout', {
+        priceId: product.priceId,
+      })
+
+      const { checkoutUrl } = response.data
+
+      window.location.href = checkoutUrl
+    } catch (err) {
+      setIsCreatingCheckoutSession(false)
+      alert('Falha ao redirecionar ao checkout')
+    }
+  }
 
   if (isFallback) {
     return <ProductSkeleton />
@@ -38,7 +60,9 @@ export default function Product({ product }: ProductProps) {
 
         <p>{product.description}</p>
 
-        <button>Comprar agora</button>
+        <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>
+          Comprar agora
+        </button>
       </S.ProductDetails>
     </S.Container>
   )
@@ -68,6 +92,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
     name: response.name,
     imageUrl: response.images[0],
     price: formatCurrency((price.unit_amount ?? 0) / 100),
+    priceId: price.id,
     description: response.description,
   }
 

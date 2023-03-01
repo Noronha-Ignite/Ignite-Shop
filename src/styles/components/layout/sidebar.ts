@@ -113,6 +113,16 @@ export const Content = styled('div', {
         transition: 'background 0.2s ease-in',
         background: '$green300',
       },
+
+      '&:not(:disabled):hover': {
+        backgroundColor: '$green300',
+        transition: 'background-color 0.2s',
+      },
+
+      '&:disabled': {
+        opacity: 0.6,
+        cursor: 'not-allowed',
+      },
     },
   },
 })

@@ -1,15 +1,45 @@
 import * as Dialog from '@radix-ui/react-dialog'
 
+import { useCart } from '@/contexts/CartContext'
 import * as S from '@/styles/components/layout/sidebar'
 import { formatCurrency } from '@/utils/format'
+import axios from 'axios'
 import Image from 'next/image'
 import { X } from 'phosphor-react'
+import { useState } from 'react'
 
 type SidebarProps = {
   children: React.ReactNode
 }
 
 export const Sidebar = ({ children }: SidebarProps) => {
+  const { items } = useCart()
+
+  const itemsQuantity = items.length
+  const totalValue = items.reduce(
+    (acc, item) => acc + item.quantity * item.product.price,
+    0,
+  )
+
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
+    useState(false)
+
+  const handleCheckoutCart = async () => {
+    try {
+      setIsCreatingCheckoutSession(true)
+      const response = await axios.post('/api/checkout', {
+        priceId: items,
+      })
+
+      const { checkoutUrl } = response.data
+
+      window.location.href = checkoutUrl
+    } catch (err) {
+      setIsCreatingCheckoutSession(false)
+      alert('Falha ao redirecionar ao checkout')
+    }
+  }
+
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
@@ -27,38 +57,47 @@ export const Sidebar = ({ children }: SidebarProps) => {
               <h1>Sacola de compras</h1>
 
               <S.ItemsWrapper>
-                <S.CartItem>
-                  <S.CartImageContainer>
-                    <Image
-                      src={require('@/assets/camisas/2.png')}
-                      alt='Camiseta'
-                      width={90}
-                      height={80}
-                    />
-                  </S.CartImageContainer>
+                {items.map((item) => (
+                  <S.CartItem key={item.product.id}>
+                    <S.CartImageContainer>
+                      <Image
+                        src={require('@/assets/camisas/2.png')}
+                        alt='Camiseta'
+                        width={90}
+                        height={80}
+                      />
+                    </S.CartImageContainer>
 
-                  <div>
-                    <h4>Camiseta Beyond the Limits</h4>
+                    <div>
+                      <h4>Camiseta Beyond the Limits</h4>
 
-                    <span>{formatCurrency(79.9)}</span>
+                      <span>{formatCurrency(79.9)}</span>
 
-                    <button>Remover</button>
-                  </div>
-                </S.CartItem>
+                      <button>Remover</button>
+                    </div>
+                  </S.CartItem>
+                ))}
               </S.ItemsWrapper>
 
               <footer>
                 <div>
                   <span>Quantidade</span>
-                  <span>3 itens</span>
+                  <span>
+                    {itemsQuantity} {itemsQuantity !== 1 ? 'itens' : 'item'}
+                  </span>
                 </div>
 
                 <div>
                   <strong>Valor total</strong>
-                  <strong>R$ 270,00</strong>
+                  <strong>{formatCurrency(totalValue)}</strong>
                 </div>
 
-                <button>Finalizar compra</button>
+                <button
+                  disabled={isCreatingCheckoutSession}
+                  onClick={handleCheckoutCart}
+                >
+                  Finalizar compra
+                </button>
               </footer>
             </S.Content>
           </S.Container>

@@ -1,13 +1,11 @@
+import { useLocalStorageState } from '@/hooks/useLocalStorage'
+import { Cart, CartProduct } from '@/models/Cart'
+import { LocalStorageKey } from '@/models/LocalStorage'
 import { Product } from '@/models/Product'
-import { createContext, useContext, useState } from 'react'
-
-type CartProduct = {
-  product: Product
-  quantity: number
-}
+import { createContext, useContext } from 'react'
 
 type CartContextProps = {
-  items: CartProduct[]
+  items: Cart
 
   addToCart(item: Product): void
   removeFromCart(itemId: string): void
@@ -21,23 +19,27 @@ export const CartContextProvider = ({
 }: {
   children: React.ReactNode
 }) => {
-  const [items, setItems] = useState<CartProduct[]>([])
+  const [items, setItems, clearItems] = useLocalStorageState(
+    LocalStorageKey.Cart,
+  )
 
   const findProductInCart = (product: Product) => {
-    return items.find((cartItem) => cartItem.product.id === product.id)
+    return items?.find((cartItem) => cartItem.product.id === product.id)
   }
 
   const updateItemInCart = (newItem: CartProduct) => {
-    if (!items.some((item) => item.product.id === newItem.product.id)) {
+    if (!items?.some((item) => item.product.id === newItem.product.id)) {
       throw new Error('Trying to update unexistent item in cart')
     }
 
-    setItems((previousItems) =>
-      previousItems.map((item) => {
+    setItems((previousItems) => {
+      if (!previousItems) return []
+
+      return previousItems.map((item) => {
         if (item.product.id === newItem.product.id) return newItem
         return item
-      }),
-    )
+      })
+    })
   }
 
   const addToCart = (item: Product) => {
@@ -53,7 +55,7 @@ export const CartContextProvider = ({
     }
 
     setItems((previous) => [
-      ...previous,
+      ...(previous ?? []),
       {
         product: item,
         quantity: 1,
@@ -63,17 +65,18 @@ export const CartContextProvider = ({
 
   const removeFromCart = (itemId: string) => {
     setItems((previous) =>
-      previous.filter((cartItem) => cartItem.product.id !== itemId),
+      (previous ?? []).filter((cartItem) => cartItem.product.id !== itemId),
     )
-  }
-
-  const clearCart = () => {
-    setItems([])
   }
 
   return (
     <CartContext.Provider
-      value={{ items, removeFromCart, addToCart, clearCart }}
+      value={{
+        items: items ?? [],
+        removeFromCart,
+        addToCart,
+        clearCart: clearItems,
+      }}
     >
       {children}
     </CartContext.Provider>

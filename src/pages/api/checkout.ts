@@ -20,7 +20,9 @@ export default async function handler(
     return res.status(400).json({ error: 'Missing `priceId` information' })
   }
 
-  const success_url = `${process.env.APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`
+  const totalItemsQuantity = items.reduce((acc, item) => acc + item.quantity, 0)
+
+  const success_url = `${process.env.APP_URL}/success?session_id={CHECKOUT_SESSION_ID}&quantity=${totalItemsQuantity}`
   const cancel_url = `${process.env.APP_URL}`
 
   const checkoutSession = await stripe.checkout.sessions.create({

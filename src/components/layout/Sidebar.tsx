@@ -19,7 +19,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
   const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
     useState(false)
 
-  const itemsQuantity = items.length
+  const itemsQuantity = items.reduce((acc, item) => acc + item.quantity, 0)
   const totalValue = items.reduce(
     (acc, item) => acc + item.quantity * item.product.price,
     0,

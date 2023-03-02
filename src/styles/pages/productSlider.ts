@@ -1,6 +1,6 @@
 import { styled } from '..'
 
-export const HomeContainer = styled('main', {
+export const SliderContainer = styled('main', {
   display: 'flex',
   width: '100%',
   marginLeft: 'auto',

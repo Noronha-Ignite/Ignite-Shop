@@ -1,3 +1,5 @@
+'use client'
+
 import { useLocalStorageState } from '@/hooks/useLocalStorage'
 import { Cart, CartProduct } from '@/models/Cart'
 import { LocalStorageKey } from '@/models/LocalStorage'

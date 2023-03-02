@@ -1,6 +1,6 @@
 import * as S from '@/styles/pages/product'
 
-export const ProductSkeleton = () => {
+export default function ProductSkeleton() {
   return (
     <S.Container style='skeleton'>
       <S.ImageContainer style='skeleton' />

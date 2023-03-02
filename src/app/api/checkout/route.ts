@@ -1,23 +1,19 @@
 import { stripe } from '@/lib/stripe'
-import type { NextApiRequest, NextApiResponse } from 'next'
+import { NextResponse } from 'next/server'
 
 type CheckoutItem = {
   price: string
   quantity: number
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse,
-) {
-  const { items } = req.body as { items: CheckoutItem[] }
+export async function POST(request: Request) {
+  const { items } = (await request.json()) as { items: CheckoutItem[] }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Route only support post method' })
-  }
-
-  if (!items.length) {
-    return res.status(400).json({ error: 'Missing `priceId` information' })
+  if (!items || !items.length) {
+    return NextResponse.json(
+      { error: 'Missing `priceId` information' },
+      { status: 400 },
+    )
   }
 
   const totalItemsQuantity = items.reduce((acc, item) => acc + item.quantity, 0)
@@ -32,5 +28,8 @@ export default async function handler(
     cancel_url,
   })
 
-  return res.status(200).json({ checkoutUrl: checkoutSession.url })
+  return NextResponse.json(
+    { checkoutUrl: checkoutSession.url },
+    { status: 200 },
+  )
 }

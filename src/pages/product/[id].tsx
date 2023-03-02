@@ -6,6 +6,7 @@ import Stripe from 'stripe'
 import { stripe } from '@/lib/stripe'
 import { formatCurrency } from '@/utils/format'
 
+import { useCart } from '@/contexts/CartContext'
 import * as S from '@/styles/pages/product'
 import Head from 'next/head'
 import { ProductSkeleton } from './_skeleton'
@@ -15,7 +16,8 @@ type ProductProps = {
     id: string
     name: string
     imageUrl: string
-    price: string
+    price: number
+    priceFormatted: string
     priceId: string
     description: string | null
   }
@@ -23,9 +25,21 @@ type ProductProps = {
 
 export default function Product({ product }: ProductProps) {
   const { isFallback } = useRouter()
+  const { addToCart } = useCart()
 
   if (isFallback) {
     return <ProductSkeleton />
+  }
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: product.id,
+      description: product.description,
+      imageUrl: product.imageUrl,
+      name: product.name,
+      price: product.price,
+      priceId: product.priceId,
+    })
   }
 
   return (
@@ -49,7 +63,7 @@ export default function Product({ product }: ProductProps) {
 
           <p>{product.description}</p>
 
-          <button>Comprar agora</button>
+          <button onClick={handleAddToCart}>Colocar na sacola</button>
         </S.ProductDetails>
       </S.Container>
     </>
@@ -79,7 +93,8 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({
     id: response.id,
     name: response.name,
     imageUrl: response.images[0],
-    price: formatCurrency((price.unit_amount ?? 0) / 100),
+    price: price.unit_amount,
+    priceFormatted: formatCurrency((price.unit_amount ?? 0) / 100),
     priceId: price.id,
     description: response.description,
   }

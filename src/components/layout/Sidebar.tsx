@@ -6,23 +6,24 @@ import { formatCurrency } from '@/utils/format'
 import axios from 'axios'
 import Image from 'next/image'
 import { X } from 'phosphor-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type SidebarProps = {
   children: React.ReactNode
 }
 
 export const Sidebar = ({ children }: SidebarProps) => {
-  const { items } = useCart()
+  const { items, removeFromCart } = useCart()
+
+  const [isOpen, setIsOpen] = useState(false)
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
+    useState(false)
 
   const itemsQuantity = items.length
   const totalValue = items.reduce(
     (acc, item) => acc + item.quantity * item.product.price,
     0,
   )
-
-  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] =
-    useState(false)
 
   const handleCheckoutCart = async () => {
     try {
@@ -40,9 +41,21 @@ export const Sidebar = ({ children }: SidebarProps) => {
     }
   }
 
+  const handleRemoveItem = (itemId: string) => {
+    removeFromCart(itemId)
+  }
+
+  useEffect(() => {
+    if (!itemsQuantity) {
+      setIsOpen(false)
+    }
+  }, [itemsQuantity])
+
   return (
-    <Dialog.Root>
-      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
+    <Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog.Trigger disabled={!itemsQuantity} asChild>
+        {children}
+      </Dialog.Trigger>
 
       <Dialog.Portal>
         <S.Overlay />
@@ -69,11 +82,16 @@ export const Sidebar = ({ children }: SidebarProps) => {
                     </S.CartImageContainer>
 
                     <div>
-                      <h4>Camiseta Beyond the Limits</h4>
+                      <h4>
+                        Camiseta Beyond the Limits{' '}
+                        {item.quantity > 1 && ` | X${item.quantity}`}
+                      </h4>
 
                       <span>{formatCurrency(79.9)}</span>
 
-                      <button>Remover</button>
+                      <button onClick={() => handleRemoveItem(item.product.id)}>
+                        Remover
+                      </button>
                     </div>
                   </S.CartItem>
                 ))}

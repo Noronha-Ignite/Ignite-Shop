@@ -28,7 +28,7 @@ export const CartContextProvider = ({
   }
 
   const updateItemInCart = (newItem: CartProduct) => {
-    if (!items.includes(newItem)) {
+    if (!items.some((item) => item.product.id === newItem.product.id)) {
       throw new Error('Trying to update unexistent item in cart')
     }
 

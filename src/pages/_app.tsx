@@ -6,6 +6,7 @@ import { CartContextProvider } from '@/contexts/CartContext'
 import { globalStyles } from '@/styles/global'
 import * as S from '@/styles/pages/app'
 import Image from 'next/image'
+import Link from 'next/link'
 import { Handbag } from 'phosphor-react'
 
 globalStyles()
@@ -15,7 +16,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <CartContextProvider>
       <S.Container>
         <S.Header>
-          <Image src={logoImg} alt='Logo Image' />
+          <Link href='/'>
+            <Image src={logoImg} alt='Logo Image' />
+          </Link>
 
           <Sidebar>
             <S.SidebarTrigger>

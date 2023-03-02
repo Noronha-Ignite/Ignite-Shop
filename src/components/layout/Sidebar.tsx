@@ -29,7 +29,10 @@ export const Sidebar = ({ children }: SidebarProps) => {
     try {
       setIsCreatingCheckoutSession(true)
       const response = await axios.post('/api/checkout', {
-        priceId: items,
+        items: items.map((item) => ({
+          price: item.product.priceId,
+          quantity: item.quantity,
+        })),
       })
 
       const { checkoutUrl } = response.data

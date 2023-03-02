@@ -68,8 +68,6 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const sessionId = query.session_id?.toString()
   const itemsQuantity = query.quantity?.toString()
 
-  console.log(itemsQuantity)
-
   if (!sessionId) {
     return {
       redirect: {

@@ -74,7 +74,7 @@ export const Sidebar = ({ children }: SidebarProps) => {
                   <S.CartItem key={item.product.id}>
                     <S.CartImageContainer>
                       <Image
-                        src={require('@/assets/camisas/2.png')}
+                        src={item.product.imageUrl}
                         alt='Camiseta'
                         width={90}
                         height={80}
@@ -83,11 +83,11 @@ export const Sidebar = ({ children }: SidebarProps) => {
 
                     <div>
                       <h4>
-                        Camiseta Beyond the Limits{' '}
-                        {item.quantity > 1 && ` | X${item.quantity}`}
+                        {item.product.name}{' '}
+                        {item.quantity > 1 && ` | x${item.quantity}`}
                       </h4>
 
-                      <span>{formatCurrency(79.9)}</span>
+                      <span>{formatCurrency(item.product.price)}</span>
 
                       <button onClick={() => handleRemoveItem(item.product.id)}>
                         Remover

@@ -7,7 +7,7 @@ import { Sidebar } from '@/components/layout/Sidebar'
 import { useCart } from '@/contexts/CartContext'
 import * as S from '@/styles/pages/header'
 
-export const Header = () => {
+export default function Header() {
   const { items } = useCart()
 
   const itemsQuantity = items.length

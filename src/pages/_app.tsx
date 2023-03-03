@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app'
 import { CartContextProvider } from '@/contexts/CartContext'
 import { globalStyles } from '@/styles/global'
 import * as S from '@/styles/pages/app'
-import { Header } from './_header'
+import Header from './_header'
 
 globalStyles()
 

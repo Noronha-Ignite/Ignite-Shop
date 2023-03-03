@@ -9,7 +9,7 @@ import { formatCurrency } from '@/utils/format'
 import { useCart } from '@/contexts/CartContext'
 import * as S from '@/styles/pages/product'
 import Head from 'next/head'
-import { ProductSkeleton } from './_skeleton'
+import ProductSkeleton from './_skeleton'
 
 type ProductProps = {
   product: {
